@@ -25,6 +25,14 @@
         .length-select.selected {
             @apply ring-2 ring-yellow-500 border-yellow-500;
         }
+        .style-card {
+            /* 默认状态 */
+            @apply bg-white border-2 border-gray-200 shadow-sm transition duration-200 cursor-pointer;
+        }
+        .style-card.selected {
+            /* 选中状态 */
+            @apply ring-4 ring-offset-2 ring-pink-500 border-pink-500 shadow-lg scale-[1.02];
+        }
     </style>
 </head>
 <body class="min-h-screen antialiased">
@@ -61,11 +69,13 @@
                     </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-gray-100">
-                    <h4 class="font-bold text-lg mb-2 text-gray-800">推荐目标发型</h4>
-                    <select id="target-style-select" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150">
-                        <option value="">请选择一个目标发型</option>
-                    </select>
+                <div class="mt-6 pt-4 border-t border-gray-100">
+                    <h4 class="font-bold text-lg mb-4 text-gray-800">该脸型推荐发型一览（点击图片选择）</h4>
+                    
+                    <!-- 目标发型图片列表容器 --><div id="style-cards-container" class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                        <!-- 发型卡片将由 JS 动态生成 -->
+                        <div class="col-span-full text-center text-gray-500 p-4" id="style-placeholder">请先选择一个脸型...</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -121,12 +131,13 @@
         </section>
     </div>
 
-    <!-- JavaScript 逻辑 --><script>
-        // --- 核心数据结构 (基于您的文案) ---
+    <!-- JavaScript 逻辑 -->
+    <script>
+        // --- 核心数据结构 (基于您的文案和新增发型) ---
 
         /**
          * 脸型数据：包含特征、思路、推荐发型等。
-         * @type {Object.<string, {name: string, features: string, pros: string, cons: string, concept: string, advice: string, avoid: string, styles: string[], img: string}>}
+         * !!! 重点：图片路径已修改为 assets/ 文件夹前缀 !!!
          */
         const faceData = {
             'round': {
@@ -138,7 +149,7 @@
                 advice: '适合前刺/抓刺/侧背等高颅顶、全露或半露额头的中短发。',
                 avoid: '齐刘海/锅盖头(强化圆润感)、小卷发(膨胀显脸大)。',
                 styles: ['基础前刺', '微分前刺', '纹理侧背', '韩式小平头', '立体前刺'],
-                img: 'face_round.png'
+                img: 'assets/face_round.png' // <--- 路径更新
             },
             'square': {
                 name: '方形脸',
@@ -149,7 +160,7 @@
                 advice: '美式前刺/侧分刘海等高颅顶，全露或半露额头的中短发。',
                 avoid: '整齐厚刘海(强化方块感)、平头(暴露骨骼线条)。',
                 styles: ['七抓刺', '短三七侧背', '美式前刺', '龙须背头', '纹理三七', '三七侧分'],
-                img: 'face_square.png'
+                img: 'assets/face_square.png' // <--- 路径更新
             },
             'oval': {
                 name: '鹅蛋脸',
@@ -160,7 +171,7 @@
                 advice: '微分碎盖/复古油头等市面常见发型都可尝试。',
                 avoid: '如果发际线偏高，不建议大背头和寸头。',
                 styles: ['清爽短碎盖', '侧分短发', '三七侧背', '凌乱抓刺', '微分碎盖', '复古油头'],
-                img: 'face_oval.png'
+                img: 'assets/face_oval.png' // <--- 路径更新
             },
             'heart': {
                 name: '心形脸',
@@ -171,7 +182,7 @@
                 advice: '微分前刺/微分碎盖等，半露额头的中短发或中长发。',
                 avoid: '过度遮挡脸型的厚重发型(浪费先天优势)。',
                 styles: ['短微分前刺', '凌乱微分', '前刺老虎头', '长微分前刺', '韩式微分', '微分碎盖'],
-                img: 'face_heart.png'
+                img: 'assets/face_heart.png' // <--- 路径更新
             },
             'long': {
                 name: '长形脸',
@@ -181,8 +192,8 @@
                 concept: '通过[侧分类刘海]遮挡额头，削弱纵向感，横向拉宽面部。',
                 advice: '微分碎盖/纹理侧分等，半露或不露额头的中短发或中长发。',
                 avoid: '贴头皮直发/大背头(拉长脸型)、超短刘海(暴露额头)。',
-                styles: ['括号刘海', '纹理三七分', '微分碎盖', '长纹理刘海', '基础前刺', '四六微分'],
-                img: 'face_long.png'
+                styles: ['括号刘海', '纹理三七分', '长纹理刘海', '基础前刺', '四六微分'],
+                img: 'assets/face_long.png' // <--- 路径更新
             },
             'diamond': { // 菱形脸
                 name: '菱形脸',
@@ -192,63 +203,109 @@
                 concept: '通过刘海和两侧发型柔化颧骨线条，增加额头宽度，平衡面部比例。',
                 advice: '中长刘海（如八字刘海）、侧分、微卷发型，避免紧贴头皮的短发。',
                 avoid: '超短刘海、平头、两侧剃光的短发（会显得颧骨更突出）。',
-                styles: ['中分微卷', '侧分刘海', '蓬松碎盖', '两边铲长刘海', '韩式纹理烫'],
-                img: 'face_diamond.png'
+                styles: ['中分微卷', '蓬松碎盖', '两边铲长刘海', '韩式纹理烫'],
+                img: 'assets/face_diamond.png' // <--- 路径更新
             }
         };
 
         /**
          * 目标发型所需的大致头发长度（厘米）
-         * { top: 顶部, fringe: 刘海, side: 侧面 }
-         * @type {Object.<string, {top: number, fringe?: number, side: number}>}
          */
         const styleLengthMap = {
-            // 圆脸
-            '基础前刺': {top: 5, fringe: 4, side: 1},
+            // 圆脸 (新增/更新)
+            '基础前刺': {top: 5.5, fringe: 4.5, side: 1.5}, 
             '微分前刺': {top: 4, fringe: 3, side: 1},
             '纹理侧背': {top: 6, fringe: 5, side: 2},
             '韩式小平头': {top: 3, fringe: 2, side: 0.5},
             '立体前刺': {top: 5, fringe: 4, side: 1},
-            // 方形脸
+            
+            // 方形脸 (新增/更新)
             '七抓刺': {top: 6, fringe: 5, side: 1.5},
-            '短三七侧背': {top: 5, fringe: 4, side: 1},
+            '短三七侧背': {top: 5, fringe: 4, side: 1}, 
+            '三七侧背': {top: 7, fringe: 6, side: 2}, 
             '美式前刺': {top: 4, fringe: 3, side: 1},
             '龙须背头': {top: 7, fringe: 6, side: 2},
             '纹理三七': {top: 6, fringe: 5, side: 1.5},
             '三七侧分': {top: 5, fringe: 4, side: 1},
-            // 鹅蛋脸
+
+            // 鹅蛋脸 (新增/更新)
             '清爽短碎盖': {top: 3, fringe: 2, side: 0.5},
-            '侧分短发': {top: 5, fringe: 4, side: 1},
+            '侧分短发': {top: 5, fringe: 4, side: 1.5}, 
             '凌乱抓刺': {top: 4, fringe: 3, side: 1},
             '微分碎盖': {top: 7, fringe: 6, side: 2},
             '复古油头': {top: 8, fringe: 7, side: 2},
-            '三七侧背': {top: 6, fringe: 5, side: 1.5}, // 鹅蛋脸新增
-            // 心形脸
-            '短微分前刺': {top: 4, fringe: 3, side: 1},
+            
+            // 心形脸 (新增/更新)
+            '短微分前刺': {top: 4, fringe: 3, side: 1}, 
             '凌乱微分': {top: 5, fringe: 4, side: 1.5},
             '前刺老虎头': {top: 6, fringe: 5, side: 1.5},
-            '长微分前刺': {top: 8, fringe: 7, side: 2},
+            '长微分前刺': {top: 8, fringe: 7, side: 2}, 
             '韩式微分': {top: 7, fringe: 6, side: 2},
-            '微分碎盖': {top: 7, fringe: 6, side: 2}, // 心形脸也有
-            // 长形脸
+            
+            // 长形脸 (新增/更新)
             '括号刘海': {top: 8, fringe: 7, side: 2},
             '纹理三七分': {top: 6, fringe: 5, side: 1.5},
-            '微分碎盖': {top: 7, fringe: 6, side: 2}, // 长形脸也有
-            '长纹理刘海': {top: 9, fringe: 8, side: 2.5},
-            '基础前刺': {top: 5, fringe: 4, side: 1}, // 长形脸也有
+            '长纹理刘海': {top: 9, fringe: 8, side: 2.5}, 
             '四六微分': {top: 7, fringe: 6, side: 2},
-            // 菱形脸
+            
+            // 菱形脸 (保持不变)
             '中分微卷': {top: 7, fringe: 8, side: 3},
-            '侧分刘海': {top: 6, fringe: 7, side: 2.5},
             '蓬松碎盖': {top: 5, fringe: 4, side: 1},
             '两边铲长刘海': {top: 7, fringe: 6, side: 1},
             '韩式纹理烫': {top: 6, fringe: 5, side: 2},
-            // 注意：已移除 '顶部蓬松碎盖', '飞机头', '中长刘海' 等仅供三角脸使用的发型，保留与其他脸型共享的发型，如 '韩式纹理烫' 和 '侧分短发'。
         };
 
         /**
+         * 发型图片文件名映射 (用于构建 URL)
+         * !!! 重点：图片路径默认为 style_images/ 文件夹前缀 !!!
+         */
+        const styleImageMap = {
+            // 圆脸
+            '基础前刺': 'changjichu_qianci.png', 
+            '微分前刺': 'weifen_qianci.png',
+            '纹理侧背': 'wenli_cebei.png',
+            '韩式小平头': 'hanshi_xiaopingtou.png',
+            '立体前刺': 'liti_qianci.png',
+            
+            // 方形脸
+            '七抓刺': 'qi_zhuaci.png',
+            '短三七侧背': 'duan_sanqi_cebei.png', 
+            '三七侧背': 'chang_sanqi_cebei.png', 
+            '美式前刺': 'meishi_qianci.png',
+            '龙须背头': 'longxu_beitou.png',
+            '纹理三七': 'wenli_sanqi.png',
+            '三七侧分': 'sanqi_cefen.png',
+
+            // 鹅蛋脸
+            '清爽短碎盖': 'qingshuang_duan_suigai.png',
+            '侧分短发': 'cefen_duanfa.png', 
+            '凌乱抓刺': 'lingluan_zhuaci.png',
+            '微分碎盖': 'weifen_suigai.png',
+            '复古油头': 'fugu_youtou.png',
+
+            // 心形脸
+            '短微分前刺': 'duan_weifen_qianci.png', 
+            '凌乱微分': 'lingluan_weifen.png', 
+            '前刺老虎头': 'qianci_laohutou.png', 
+            '长微分前刺': 'chang_weifen_qianci.png', 
+            '韩式微分': 'hanshi_weifen.png',
+
+            // 长形脸
+            '括号刘海': 'kuohao_liuhai.png',
+            '纹理三七分': 'wenli_sanqifen.png',
+            '长纹理刘海': 'chang_wenli_liuhai.png', 
+            '四六微分': 'siliu_weifen.png',
+
+            // 菱形脸
+            '中分微卷': 'zhongfen_weijuan.png',
+            '蓬松碎盖': 'pengsong_suigai.png',
+            '两边铲长刘海': 'liangbian_chan_chang_liuhai.png',
+            '韩式纹理烫': 'hanshi_wenli_tang.png',
+        };
+
+
+        /**
          * 当前头发长度选项及对应的平均长度（厘米）
-         * @type {Object.<string, number>}
          */
         const lengthOptions = {
             '极短 (0.5-1cm)': 0.75,
@@ -275,7 +332,8 @@
         // --- DOM 元素引用 ---
         const $faceSelection = document.getElementById('face-shape-selection');
         const $analysisSection = document.getElementById('hair-analysis-section');
-        const $targetStyleSelect = document.getElementById('target-style-select');
+        const $styleCardsContainer = document.getElementById('style-cards-container'); 
+        const $stylePlaceholder = document.getElementById('style-placeholder'); 
         const $currentLengthTop = document.getElementById('current-length-top');
         const $currentLengthFringe = document.getElementById('current-length-fringe');
         const $currentLengthSide = document.getElementById('current-length-side');
@@ -294,6 +352,7 @@
         function renderFaceShapeButtons() {
             $faceSelection.innerHTML = Object.entries(faceData).map(([key, data]) => `
                 <button data-shape="${key}" class="face-shape-btn p-3 bg-white text-gray-700 border-2 border-gray-300 rounded-lg shadow-sm hover:bg-indigo-100 transition duration-150 font-semibold text-sm flex flex-col items-center justify-center text-center space-y-2" onclick="selectFaceShape('${key}')">
+                    <!-- 注意：这里的路径使用了 data.img 中定义的 assets/ 前缀 -->
                     <img src="${data.img}" alt="${data.name}脸" class="w-12 h-12 object-contain rounded-full border border-gray-200" onerror="this.onerror=null; this.src='https://placehold.co/48x48/f0f4f8/8b5cf6?text=${data.name[0]}'">
                     <span>${data.name}</span>
                 </button>
@@ -314,12 +373,47 @@
         }
 
         /**
+         * 渲染目标发型卡片列表
+         * @param {string[]} styles - 该脸型推荐的所有发型名称
+         */
+        function renderStyleCards(styles) {
+            $styleCardsContainer.innerHTML = ''; // 清空容器
+            $stylePlaceholder.classList.add('hidden');
+
+            const cardsHtml = styles.map(style => {
+                const len = styleLengthMap[style];
+                // 确保使用 styleImageMap 提供的文件名
+                const fileName = styleImageMap[style] || 'placeholder.png'; 
+                const lenText = len ? `顶: ${len.top}cm | 刘: ${len.fringe || '?'}cm` : '长度信息缺失';
+                
+                return `
+                    <div data-style="${style}" onclick="selectTargetStyle('${style}')" class="style-card rounded-xl p-2 flex flex-col overflow-hidden hover:shadow-xl hover:bg-gray-50">
+                        <div class="h-32 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center mb-2">
+                            <!-- 注意：这里的图片路径是 style_images/ -->
+                            <img src="style_images/${fileName}" alt="${style}发型预览图" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/150x128/9CA3AF/ffffff?text=${style}';">
+                        </div>
+                        <h5 class="text-base font-bold text-gray-800 truncate">${style}</h5>
+                        <p class="text-xs text-gray-500 mt-1">${lenText}</p>
+                    </div>
+                `;
+            }).join('');
+            
+            $styleCardsContainer.innerHTML = cardsHtml;
+            
+            // 默认选中第一个发型
+            if (styles.length > 0) {
+                 selectTargetStyle(styles[0]);
+            }
+        }
+
+        /**
          * 处理脸型选择
          * @param {string} shapeKey - 选中的脸型键
          */
         window.selectFaceShape = function(shapeKey) {
             selectedFaceShape = shapeKey;
             const data = faceData[shapeKey];
+            selectedTargetStyle = null; // 重置目标发型
 
             // 1. 更新按钮视觉状态
             document.querySelectorAll('.face-shape-btn').forEach(btn => {
@@ -339,26 +433,40 @@
             document.getElementById('analysis-advice').textContent = data.advice;
             document.getElementById('analysis-avoid').textContent = data.avoid;
 
-            // 3. 渲染目标发型下拉菜单
-            let styleOptions = '<option value="">请选择一个目标发型</option>';
-            styleOptions += data.styles.map(style => {
-                const len = styleLengthMap[style];
-                // 确保 fringe 字段存在，否则使用 '?'
-                const lenText = len ? `顶部约${len.top}cm / 刘海约${len.fringe || '?'}cm` : '?cm';
-                return `<option value="${style}">${style} (${lenText})</option>`;
-            }).join('');
-            $targetStyleSelect.innerHTML = styleOptions;
+            // 3. 渲染目标发型卡片列表（并自动选中第一个）
+            renderStyleCards(data.styles);
 
             // 4. 显示后续步骤
             $analysisSection.classList.remove('hidden');
             $lengthCalcSection.classList.remove('hidden');
-            $communicationOutput.classList.add('hidden'); // 隐藏沟通指令直到发型和长度选择完整
+            $communicationOutput.classList.add('hidden'); // 默认隐藏，选中发型后显示
             $growthResultCard.classList.add('hidden');
-            selectedTargetStyle = null; // 重置目标发型
-            $targetStyleSelect.value = "";
-            $barberScript.value = "";
             resetLengthInputs(); // 重置长度选择
         }
+
+        /**
+         * 处理目标发型选择
+         * @param {string} styleName - 选中的发型名称
+         */
+        window.selectTargetStyle = function(styleName) {
+            selectedTargetStyle = styleName;
+
+            // 1. 更新卡片视觉状态
+            document.querySelectorAll('.style-card').forEach(card => {
+                if (card.dataset.style === styleName) {
+                    card.classList.add('selected');
+                } else {
+                    card.classList.remove('selected');
+                }
+            });
+
+            // 2. 尝试进行计算和生成文案
+            if (selectedTargetStyle) {
+                $communicationOutput.classList.remove('hidden'); 
+                calculateGrowthTime();
+                generateBarberScript();
+            }
+        };
 
         /**
          * 重置所有长度选择器的值
@@ -370,21 +478,6 @@
             currentLengths = { top: null, fringe: null, side: null };
             document.querySelectorAll('.length-select').forEach(select => select.classList.remove('selected'));
         }
-
-        /**
-         * 监听目标发型选择变化
-         */
-        $targetStyleSelect.onchange = function() {
-            selectedTargetStyle = $targetStyleSelect.value;
-            // 只要选择了目标发型，就尝试进行计算和生成文案
-            calculateGrowthTime();
-            generateBarberScript();
-            if (selectedTargetStyle) {
-                $communicationOutput.classList.remove('hidden'); 
-            } else {
-                 $communicationOutput.classList.add('hidden');
-            }
-        };
 
         /**
          * 监听当前长度选择变化 (统一处理)
@@ -411,9 +504,8 @@
          * 自动计算所需生长周期
          */
         window.calculateGrowthTime = function() {
-            // 只有当脸型、目标发型和所有当前长度都选择后才进行计算
-            // 目标发型必须被选中，当前长度至少顶部、刘海、侧面三个都必须有值
-            if (!selectedFaceShape || !selectedTargetStyle || currentLengths.top === null || currentLengths.fringe === null || currentLengths.side === null) {
+            // 只有当目标发型和所有当前长度都选择后才进行计算
+            if (!selectedTargetStyle || currentLengths.top === null || currentLengths.fringe === null || currentLengths.side === null) {
                 $growthResultCard.classList.add('hidden');
                 return;
             }
@@ -514,7 +606,7 @@
 
 【剪发重点提醒】
 1. 顶部：请根据目标长度修剪，并利用${face.name}特点（${face.cons}），通过剪裁增加[视觉颅顶]或[两侧宽度]，达到${face.concept.replace(/\[|\]/g, '')}的效果。
-2. 侧面：请干净利落地处理两侧，建议使用${targetLengths.side === 0.5 ? '推边（Fade）' : '渐变或清爽修剪'}。
+2. 侧面：请干净利落地处理两侧，建议使用${targetLengths.side <= 1 ? '推边（Fade）' : '渐变或清爽修剪'}。
 3. 造型：请使用适合的发蜡/发泥或定型喷雾，帮我打造${selectedTargetStyle}的最终造型。
 
 谢谢您的帮助！
