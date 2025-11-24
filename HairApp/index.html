@@ -149,7 +149,7 @@
                 advice: '适合前刺/抓刺/侧背等高颅顶、全露或半露额头的中短发。',
                 avoid: '齐刘海/锅盖头(强化圆润感)、小卷发(膨胀显脸大)。',
                 styles: ['基础前刺', '微分前刺', '纹理侧背', '韩式小平头', '立体前刺'],
-                img: 'assets/face_round.png' // <--- 路径更新
+                img: 'assets/face_round.png' 
             },
             'square': {
                 name: '方形脸',
@@ -159,8 +159,8 @@
                 concept: '通过蓬松颅顶，视觉上弱化下额，增强面部柔和感',
                 advice: '美式前刺/侧分刘海等高颅顶，全露或半露额头的中短发。',
                 avoid: '整齐厚刘海(强化方块感)、平头(暴露骨骼线条)。',
-                styles: ['七抓刺', '短三七侧背', '美式前刺', '龙须背头', '纹理三七', '三七侧分'],
-                img: 'assets/face_square.png' // <--- 路径更新
+                styles: ['七抓刺', '短三七侧背', '美式前刺', '纹理三七', '三七侧分'], // 移除龙须背头，虽然也适合，但将其优先给菱形脸
+                img: 'assets/face_square.png' 
             },
             'oval': {
                 name: '鹅蛋脸',
@@ -171,7 +171,7 @@
                 advice: '微分碎盖/复古油头等市面常见发型都可尝试。',
                 avoid: '如果发际线偏高，不建议大背头和寸头。',
                 styles: ['清爽短碎盖', '侧分短发', '三七侧背', '凌乱抓刺', '微分碎盖', '复古油头'],
-                img: 'assets/face_oval.png' // <--- 路径更新
+                img: 'assets/face_oval.png' 
             },
             'heart': {
                 name: '心形脸',
@@ -181,8 +181,8 @@
                 concept: '通过两侧刘海[修饰宽额头]，增加面部视觉平衡。',
                 advice: '微分前刺/微分碎盖等，半露额头的中短发或中长发。',
                 avoid: '过度遮挡脸型的厚重发型(浪费先天优势)。',
-                styles: ['短微分前刺', '凌乱微分', '前刺老虎头', '长微分前刺', '韩式微分', '微分碎盖'],
-                img: 'assets/face_heart.png' // <--- 路径更新
+                styles: ['短微分前刺', '凌乱微分', '前刺老虎头', '长微分前刺', '韩式微分'], // 微分碎盖也适合，但已放在鹅蛋脸
+                img: 'assets/face_heart.png' 
             },
             'long': {
                 name: '长形脸',
@@ -192,19 +192,20 @@
                 concept: '通过[侧分类刘海]遮挡额头，削弱纵向感，横向拉宽面部。',
                 advice: '微分碎盖/纹理侧分等，半露或不露额头的中短发或中长发。',
                 avoid: '贴头皮直发/大背头(拉长脸型)、超短刘海(暴露额头)。',
-                styles: ['括号刘海', '纹理三七分', '长纹理刘海', '基础前刺', '四六微分'],
-                img: 'assets/face_long.png' // <--- 路径更新
+                styles: ['纹理三七分', '长纹理刘海', '基础前刺', '四六微分'], // 移除括号刘海，将其优先给菱形脸
+                img: 'assets/face_long.png' 
             },
-            'diamond': { // 菱形脸
+            'diamond': { // 菱形脸 - 重点更新
                 name: '菱形脸',
                 features: '颧骨宽, 额头和下巴较窄, 棱角分明',
                 pros: '轮廓感强, 造型感突出',
                 cons: '易显刻薄, 颧骨突出',
                 concept: '通过刘海和两侧发型柔化颧骨线条，增加额头宽度，平衡面部比例。',
-                advice: '中长刘海（如八字刘海）、侧分、微卷发型，避免紧贴头皮的短发。',
+                advice: '中长刘海、侧分、微卷发型，避免紧贴头皮的短发。',
                 avoid: '超短刘海、平头、两侧剃光的短发（会显得颧骨更突出）。',
-                styles: ['中分微卷', '蓬松碎盖', '两边铲长刘海', '韩式纹理烫'],
-                img: 'assets/face_diamond.png' // <--- 路径更新
+                // 根据用户要求更新列表，新增发型已加入映射
+                styles: ['龙须背头', '括号刘海', '日式中长发', '纹理微分', '四六侧分', '前刺老虎头'], 
+                img: 'assets/face_diamond.png' 
             }
         };
 
@@ -212,47 +213,52 @@
          * 目标发型所需的大致头发长度（厘米）
          */
         const styleLengthMap = {
-            // 圆脸 (新增/更新)
+            // 圆脸 (更新)
             '基础前刺': {top: 5.5, fringe: 4.5, side: 1.5}, 
             '微分前刺': {top: 4, fringe: 3, side: 1},
             '纹理侧背': {top: 6, fringe: 5, side: 2},
             '韩式小平头': {top: 3, fringe: 2, side: 0.5},
             '立体前刺': {top: 5, fringe: 4, side: 1},
             
-            // 方形脸 (新增/更新)
+            // 方形脸 (更新)
             '七抓刺': {top: 6, fringe: 5, side: 1.5},
             '短三七侧背': {top: 5, fringe: 4, side: 1}, 
-            '三七侧背': {top: 7, fringe: 6, side: 2}, 
             '美式前刺': {top: 4, fringe: 3, side: 1},
-            '龙须背头': {top: 7, fringe: 6, side: 2},
             '纹理三七': {top: 6, fringe: 5, side: 1.5},
             '三七侧分': {top: 5, fringe: 4, side: 1},
 
-            // 鹅蛋脸 (新增/更新)
+            // 鹅蛋脸 (更新)
             '清爽短碎盖': {top: 3, fringe: 2, side: 0.5},
             '侧分短发': {top: 5, fringe: 4, side: 1.5}, 
+            '三七侧背': {top: 7, fringe: 6, side: 2}, 
             '凌乱抓刺': {top: 4, fringe: 3, side: 1},
             '微分碎盖': {top: 7, fringe: 6, side: 2},
             '复古油头': {top: 8, fringe: 7, side: 2},
             
-            // 心形脸 (新增/更新)
+            // 心形脸 (更新)
             '短微分前刺': {top: 4, fringe: 3, side: 1}, 
             '凌乱微分': {top: 5, fringe: 4, side: 1.5},
-            '前刺老虎头': {top: 6, fringe: 5, side: 1.5},
+            '前刺老虎头': {top: 6, fringe: 5, side: 1.5}, // 修正后的前刺老虎头长度
             '长微分前刺': {top: 8, fringe: 7, side: 2}, 
             '韩式微分': {top: 7, fringe: 6, side: 2},
             
-            // 长形脸 (新增/更新)
-            '括号刘海': {top: 8, fringe: 7, side: 2},
+            // 长形脸 (更新)
             '纹理三七分': {top: 6, fringe: 5, side: 1.5},
             '长纹理刘海': {top: 9, fringe: 8, side: 2.5}, 
             '四六微分': {top: 7, fringe: 6, side: 2},
             
-            // 菱形脸 (保持不变)
-            '中分微卷': {top: 7, fringe: 8, side: 3},
-            '蓬松碎盖': {top: 5, fringe: 4, side: 1},
-            '两边铲长刘海': {top: 7, fringe: 6, side: 1},
-            '韩式纹理烫': {top: 6, fringe: 5, side: 2},
+            // 菱形脸 (更新/新增)
+            '中分微卷': {top: 7, fringe: 8, side: 3}, // 原有菱形脸发型
+            '蓬松碎盖': {top: 5, fringe: 4, side: 1}, // 原有菱形脸发型
+            '两边铲长刘海': {top: 7, fringe: 6, side: 1}, // 原有菱形脸发型
+            '韩式纹理烫': {top: 6, fringe: 5, side: 2}, // 原有菱形脸发型
+            
+            // 菱形脸新增/迁移的发型
+            '龙须背头': {top: 7, fringe: 6, side: 2}, // 迁移自方形脸
+            '括号刘海': {top: 8, fringe: 7, side: 2}, // 迁移自长形脸
+            '日式中长发': {top: 9, fringe: 10, side: 4}, // 新增：中长发，长度偏长
+            '纹理微分': {top: 7, fringe: 6, side: 2}, // 新增：中等长度
+            '四六侧分': {top: 6.5, fringe: 5.5, side: 2}, // 新增：中等长度
         };
 
         /**
@@ -270,15 +276,14 @@
             // 方形脸
             '七抓刺': 'qi_zhuaci.png',
             '短三七侧背': 'duan_sanqi_cebei.png', 
-            '三七侧背': 'chang_sanqi_cebei.png', 
             '美式前刺': 'meishi_qianci.png',
-            '龙须背头': 'longxu_beitou.png',
             '纹理三七': 'wenli_sanqi.png',
             '三七侧分': 'sanqi_cefen.png',
 
             // 鹅蛋脸
             '清爽短碎盖': 'qingshuang_duan_suigai.png',
             '侧分短发': 'cefen_duanfa.png', 
+            '三七侧背': 'chang_sanqi_cebei.png', 
             '凌乱抓刺': 'lingluan_zhuaci.png',
             '微分碎盖': 'weifen_suigai.png',
             '复古油头': 'fugu_youtou.png',
@@ -286,12 +291,11 @@
             // 心形脸
             '短微分前刺': 'duan_weifen_qianci.png', 
             '凌乱微分': 'lingluan_weifen.png', 
-            '前刺老虎头': 'qianci_laohutou.png', 
+            '前刺老虎头': 'qianci_laohutou.png', // 统一名称，确保图片文件名为 qianci_laohutou.png
             '长微分前刺': 'chang_weifen_qianci.png', 
             '韩式微分': 'hanshi_weifen.png',
 
             // 长形脸
-            '括号刘海': 'kuohao_liuhai.png',
             '纹理三七分': 'wenli_sanqifen.png',
             '长纹理刘海': 'chang_wenli_liuhai.png', 
             '四六微分': 'siliu_weifen.png',
@@ -301,6 +305,13 @@
             '蓬松碎盖': 'pengsong_suigai.png',
             '两边铲长刘海': 'liangbian_chan_chang_liuhai.png',
             '韩式纹理烫': 'hanshi_wenli_tang.png',
+            
+            // 新增/迁移发型 (确保您上传的图片名为以下文件名)
+            '龙须背头': 'longxu_beitou.png',
+            '括号刘海': 'kuohao_liuhai.png',
+            '日式中长发': 'rishi_zhongchangfa.png', // 假设您的文件名为 rishi_zhongchangfa.png
+            '纹理微分': 'wenli_weifen.png',         // 假设您的文件名为 wenli_weifen.png
+            '四六侧分': 'siliu_cefen.png',         // 假设您的文件名为 siliu_cefen.png
         };
 
 
@@ -389,7 +400,7 @@
                 return `
                     <div data-style="${style}" onclick="selectTargetStyle('${style}')" class="style-card rounded-xl p-2 flex flex-col overflow-hidden hover:shadow-xl hover:bg-gray-50">
                         <div class="h-32 bg-gray-100 rounded-lg overflow-hidden flex items-center justify-center mb-2">
-                            <!-- 注意：这里的图片路径是 style_images/ -->
+                            <!-- 确保图片路径是 style_images/ -->
                             <img src="style_images/${fileName}" alt="${style}发型预览图" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='https://placehold.co/150x128/9CA3AF/ffffff?text=${style}';">
                         </div>
                         <h5 class="text-base font-bold text-gray-800 truncate">${style}</h5>
